@@ -1,6 +1,6 @@
 # pi-coauthor
 
-Unha extensión para o [axente de código Pi](https://github.com/earendil-works/pi-coding-agent)
+Unha extensión para o [axente de código Pi](https://github.com/earendil-works/pi)
 que instala un hook de git `prepare-commit-msg` por repositorio. En cada commit engade dous trailers
 de atribución á mensaxe, se non están xa presentes:
 
