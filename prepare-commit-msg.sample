@@ -1,10 +1,21 @@
 #!/bin/sh
 # Instalado por pi-coauthor. Non borres a man; usa /pi-coauthor-off.
-# Só engade trailers se o commit se fai "desde Pi" (variábel de contorno PI_COAUTHOR=1).
+# Hook DINÁMICO: modelo/versión lidos de $GIT_DIR/pi-coauthor.state
+# (ese ficheiro xérao a extensión en session_start e actualízao en model_select;
+# en instalación manual créao ti, véxase o README).
 # Uso: PI_COAUTHOR=1 git commit -m "..."
 # Os commits manuais (sen a variábel) NUNCA levan trailers.
 if [ -z "${PI_COAUTHOR:-}" ]; then exit 0; fi
+state="${GIT_DIR:-$(git rev-parse --git-dir)}/pi-coauthor.state"
+if [ ! -f "$state" ]; then exit 0; fi
+. "$state"
+[ -n "$PI_COAUTHOR_MODEL" ] || exit 0
 MSG="$1"
-grep -q "^Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>$" "$MSG" || printf '%s\n' 'Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>' >> "$MSG"
-grep -q "^Generated-By: Pi 0.85.1$" "$MSG" || printf '%s\n' 'Generated-By: Pi 0.85.1' >> "$MSG"
+if ! grep -q "^Co-authored-by: ${PI_COAUTHOR_MODEL} <${PI_COAUTHOR_MODEL}@users.noreply.github.com>$" "$MSG"; then
+  # Liña en branco antes do primeiro trailer (convención de trailers de git)
+  [ -n "$(tail -n 1 "$MSG")" ] && printf "\n" >> "$MSG"
+  printf '%s\n' "Co-authored-by: ${PI_COAUTHOR_MODEL} <${PI_COAUTHOR_MODEL}@users.noreply.github.com>" >> "$MSG"
+fi
+[ -n "$PI_COAUTHOR_VERSION" ] || { echo "Generated-By: Pi ${PI_COAUTHOR_VERSION}" >> "$MSG"; exit 0; }
+grep -q "^Generated-By: Pi ${PI_COAUTHOR_VERSION}$" "$MSG" || printf '%s\n' "Generated-By: Pi ${PI_COAUTHOR_VERSION}" >> "$MSG"
 exit 0

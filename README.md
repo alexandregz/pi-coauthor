@@ -20,9 +20,15 @@ do proxecto) — nunca toca repositorios onde Pi non executou.
 
 ## Como funciona
 
-En `session_start`, a extensión detecta o modelo activo (`ctx.model.id` ou `$PI_MODEL`) e a versión
-de Pi instalada (`pi --version`), e escribe un hook `prepare-commit-msg` en `<repo>/.git/hooks/`
-con eses valores incrustados.
+En `session_start`, a extensión escribe un hook `prepare-commit-msg` en `<repo>/.git/hooks/` e un
+ficheiro de estado dinámico en `<repo>/.git/pi-coauthor.state` co modelo e a versión de Pi actuais.
+
+O hook **non leva modelo/versión incrustados**: en cada commit le o ficheiro de estado
+(`$GIT_DIR/pi-coauthor.state`) e usa os valores deses momento:
+
+- se cambias de modelo a metade de sesión (evento `model_select`), a extensión actualiza o estado ao
+  instante e o seguinte commit anota o modelo novo;
+- se actualizas Pi, o `session_start` seguinte rexistra a versión nova.
 
 No momento do commit o hook só engade as liñas que faltan, así que as mensaxes existentes/editadas e
 os trailers que escribas ti nunca se duplican nin sobrescriben. Sempre sae con `0`, polo que nunca
@@ -45,6 +51,8 @@ mensaxe (`exit 0`). Así, un commit manual —con editor ou con `-m`— queda se
   GitHub e son idempotentes (sen duplicados).
 - **Só commits de Pi** — os trailers engádense unicamente cando existe `PI_COAUTHOR=1`; un commit
   manual queda intacto.
+- **Estado dinámico** — o modelo/versión anotados son os do momento do commit (ler de
+  `pi-coauthor.state`), non os da instalación.
 
 ---
 
@@ -75,16 +83,21 @@ Coloca `pi-coauthor.ts` directamente no directorio de extensións que Pi descubr
 
 ### Opción C — hook de mostra manual
 
-`prepare-commit-msg.sample` é un hook autónomo listo para usar, con valores concretos incrustados.
-Instálao manualmente:
+`prepare-commit-msg.sample` é o hook dinámico autónomo (sen valores incrustados). Instálao manualmente
+xunto co seu ficheiro de estado:
 
 ```bash
 cp prepare-commit-msg.sample <repo>/.git/hooks/prepare-commit-msg
 chmod +x <repo>/.git/hooks/prepare-commit-msg
+
+# Ficheiro de estado (modelo e versión actuais; o hook léo en cada commit)
+cat > <repo>/.git/pi-coauthor.state <<'EOF'
+PI_COAUTHOR_MODEL='deepseek-v4-flash'
+PI_COAUTHOR_VERSION='0.85.1'
+EOF
 ```
 
-Edita as liñas `Co-authored-by:` / `Generated-By:` incrustadas para que coincidan co teu modelo e
-versión.
+Actualiza manualmente ese ficheiro cando cambies de modelo ou versión de Pi.
 
 ---
 
@@ -92,8 +105,8 @@ versión.
 
 | Comando | Efecto |
 |---------|--------|
-| `/pi-coauthor` | Reinstala/actualiza o hook do repositorio actual (incrusta o modelo e a versión activos) e amosa os valores actuais. |
-| `/pi-coauthor-off` | Elimina o hook de pi-coauthor do repositorio actual. |
+| `/pi-coauthor` | Reinstala o hook e actualiza o estado (modelo e versión actuais) deste repositorio. |
+| `/pi-coauthor-off` | Elimina o hook e o seu estado de pi-coauthor do repositorio actual. |
 
 O hook actívase automaticamente no seguinte commit **cando se fai dende Pi**:
 
