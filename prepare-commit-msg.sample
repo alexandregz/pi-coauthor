@@ -1,0 +1,6 @@
+#!/bin/sh
+# Instalado por pi-coauthor. Non borres a man; usa /pi-coauthor-off.
+MSG="$1"
+grep -q "^Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>$" "$MSG" || printf '%s\n' 'Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>' >> "$MSG"
+grep -q "^Generated-By: Pi 0.85.1$" "$MSG" || printf '%s\n' 'Generated-By: Pi 0.85.1' >> "$MSG"
+exit 0
