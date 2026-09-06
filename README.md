@@ -38,14 +38,30 @@ bloquea un commit.
 
 ## Instalación
 
-### Opción A — extensión de Pi (automática)
+### Opción A — paquete dende GitHub (recomendada)
 
-1. Coloca `pi-coauthor.ts` no directorio de extensións que Pi descubre automaticamente:
-   `~/.pi/agent/extensions/`
-2. Recarga/arrinca unha sesión de Pi dentro dun repositorio git. O hook instálase
-   automaticamente.
+O repo é un paquete instalable: contén un `package.json` co campo `pi.extensions`, así que Pi o
+recoñece automaticamente como directorio de extensión. Clona o repo no directorio global de
+extensións de Pi:
 
-### Opción B — hook de mostra manual
+```bash
+git clone git@github.com:alexandregz/pi-coauthor.git ~/.pi/agent/extensions/pi-coauthor
+```
+
+Reinicia Pi (ou abre unha sesión nova). O hook instálase automaticamente en `session_start` dentro
+de calquera repo onde arrinque Pi. Para actualizar:
+
+```bash
+cd ~/.pi/agent/extensions/pi-coauthor && git pull
+```
+
+### Opción B — ficheiro único
+
+Coloca `pi-coauthor.ts` directamente no directorio de extensións que Pi descubre automaticamente
+(`~/.pi/agent/extensions/`). Útil se non queres clonar o repo enteiro, pero non terás updates por
+`git pull`.
+
+### Opción C — hook de mostra manual
 
 `prepare-commit-msg.sample` é un hook autónomo listo para usar, con valores concretos incrustados.
 Instálao manualmente:
@@ -87,11 +103,30 @@ Generated-By: Pi 0.85.1
 ```
 pi-coauthor.ts                 Extensión de Pi (TypeScript) que instala/elimina o hook
 prepare-commit-msg.sample      Modelo de hook autónomo (instalación manual)
-.gitignore
+package.json                   Manifest de Pi (campo `pi.extensions`) — fai o repo clonable
 README.md
+LICENSE
+.gitignore
 ```
 
 ---
+
+## Empaquetado
+
+O repo é un paquete de extensión de Pi instalable por `git clone`. A chave é o `package.json`:
+
+```json
+{
+  "name": "pi-coauthor",
+  "pi": {
+    "extensions": ["pi-coauthor.ts"]
+  }
+}
+```
+
+Pi descubre extensións nun subdirectorio de `~/.pi/agent/extensions/` se contén un `index.ts` ou un
+`package.json` co campo `pi.extensions` (array de rutas). Cando o repo se clona nese directorio, Pi
+le o manifest e carga `pi-coauthor.ts` automaticamente.
 
 ## Notas de desenvolvemento
 

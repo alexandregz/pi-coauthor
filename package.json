@@ -1,0 +1,29 @@
+{
+  "name": "pi-coauthor",
+  "version": "0.1.0",
+  "description": "Pi extension that installs a per-repository prepare-commit-msg git hook adding Co-authored-by and Generated-By trailers to commit messages.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "pi",
+    "pi-extension",
+    "git",
+    "hook",
+    "prepare-commit-msg",
+    "co-author"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexandregz/pi-coauthor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexandregz/pi-coauthor/issues"
+  },
+  "homepage": "https://github.com/alexandregz/pi-coauthor#readme",
+  "author": "Alexandre Espinosa Menor <aemenor@gmail.com>",
+  "pi": {
+    "extensions": [
+      "pi-coauthor.ts"
+    ]
+  }
+}
