@@ -12,6 +12,10 @@ Generated-By: Pi <VERSION>
 O hook está restrinxido ao repositorio onde se lanza Pi (o mesmo modelo que o estado local `.atl`
 do proxecto) — nunca toca repositorios onde Pi non executou.
 
+> ⚠️ **Só commits feitos "dende Pi"** — os trailers engádense unicamente cando o commit se fai coa
+> variábel de contorno `PI_COAUTHOR=1` presente (é dicir, `PI_COAUTHOR=1 git commit -m "..."`).
+> Un commit manual (sen o marcador) **nunca** leva trailers.
+
 ---
 
 ## Como funciona
@@ -24,6 +28,12 @@ No momento do commit o hook só engade as liñas que faltan, así que as mensaxe
 os trailers que escribas ti nunca se duplican nin sobrescriben. Sempre sae con `0`, polo que nunca
 bloquea un commit.
 
+### O marcador `PI_COAUTHOR`
+
+Para distinguir os commits feitos **dende Pi** dos **manuais**, o hook só actúa se a variábel de
+contorno `PI_COAUTHOR` está presente no ambiente do `git commit`. Se non está, sae sen tocar a
+mensaxe (`exit 0`). Así, un commit manual —con editor ou con `-m`— queda sempre intacto.
+
 ### Garantías de seguridade
 
 - **Respecta hooks existentes** — se xa existe un `prepare-commit-msg` que non sexa de pi-coauthor,
@@ -33,6 +43,8 @@ bloquea un commit.
 - **Só en repositorios git** — executar Pi fóra dun repo git non fai nada.
 - **Formato de trailer** — os trailers `Co-authored-by:` / `Generated-By:` seguen as convencións de
   GitHub e son idempotentes (sen duplicados).
+- **Só commits de Pi** — os trailers engádense unicamente cando existe `PI_COAUTHOR=1`; un commit
+  manual queda intacto.
 
 ---
 
@@ -83,7 +95,15 @@ versión.
 | `/pi-coauthor` | Reinstala/actualiza o hook do repositorio actual (incrusta o modelo e a versión activos) e amosa os valores actuais. |
 | `/pi-coauthor-off` | Elimina o hook de pi-coauthor do repositorio actual. |
 
-O hook actívase automaticamente no seguinte commit — non require ningunha acción adicional.
+O hook actívase automaticamente no seguinte commit **cando se fai dende Pi**:
+
+```bash
+# Commit "dende Pi" → engade os trailers
+PI_COAUTHOR=1 git commit -m "mensaxe"
+
+# Commit manual → sen trailers (aínda que uses -m)
+git commit -m "mensaxe"
+```
 
 ---
 

@@ -5,12 +5,15 @@ import { execFileSync } from "node:child_process";
 
 // pi-coauthor
 // Instala un hook `prepare-commit-msg` por proxecto (no `.git/hooks` do repo onde Pi se lanza,
-// igual que se fai co `.atl`) que engade ós commits, se non están:
+// igual que se fai co `.atl`) que engade ós commits feitos "dende Pi" (PI_COAUTHOR=1), se non están:
 //   Co-authored-by: <PI_MODEL> <PI_MODEL@users.noreply.github.com>
 //   Generated-By: Pi <VERSION>
+// Commit dende Pi:  PI_COAUTHOR=1 git commit -m "..."
+// Os commits manuais NUNCA levan trailers.
 // Scope: só repos onde se lanzou Pi. Para desinstalar: /pi-coauthor-off.
 
 const MARKER = "# Instalado por pi-coauthor";
+const ENV_MARKER = "PI_COAUTHOR";
 const HOOK_NAME = "prepare-commit-msg";
 
 let cachedVersion: string | null = null;
@@ -44,6 +47,8 @@ function hookScript(model: string, version: string): string {
   return [
     "#!/bin/sh",
     `${MARKER}. Non borres a man; usa /pi-coauthor-off.`,
+    // Commit manual (sen o marcador PI_COAUTHOR): saír sen tocar a mensaxe.
+    'if [ -z "${PI_COAUTHOR:-}" ]; then exit 0; fi',
     'MSG="$1"',
     `grep -q "^${coauthor}$" "$MSG" || printf '%s\\n' '${coauthor}' >> "$MSG"`,
     `grep -q "^${genby}$" "$MSG" || printf '%s\\n' '${genby}' >> "$MSG"`,

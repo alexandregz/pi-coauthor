@@ -1,5 +1,9 @@
 #!/bin/sh
 # Instalado por pi-coauthor. Non borres a man; usa /pi-coauthor-off.
+# Só engade trailers se o commit se fai "desde Pi" (variábel de contorno PI_COAUTHOR=1).
+# Uso: PI_COAUTHOR=1 git commit -m "..."
+# Os commits manuais (sen a variábel) NUNCA levan trailers.
+if [ -z "${PI_COAUTHOR:-}" ]; then exit 0; fi
 MSG="$1"
 grep -q "^Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>$" "$MSG" || printf '%s\n' 'Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>' >> "$MSG"
 grep -q "^Generated-By: Pi 0.85.1$" "$MSG" || printf '%s\n' 'Generated-By: Pi 0.85.1' >> "$MSG"
