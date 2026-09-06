@@ -5,8 +5,11 @@
   "license": "MIT",
   "type": "module",
   "keywords": [
+    "pi-package",
     "pi",
+    "pi-coding-agent",
     "pi-extension",
+    "extension",
     "git",
     "hook",
     "prepare-commit-msg",
@@ -21,9 +24,23 @@
   },
   "homepage": "https://github.com/alexandregz/pi-coauthor#readme",
   "author": "Alexandre Espinosa Menor <aemenor@gmail.com>",
+  "files": [
+    "pi-coauthor.ts",
+    "prepare-commit-msg.sample",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
   "pi": {
     "extensions": [
-      "pi-coauthor.ts"
+      "./pi-coauthor.ts"
     ]
   }
 }
