@@ -130,6 +130,8 @@ le o manifest e carga `pi-coauthor.ts` automaticamente.
 
 ## Notas de desenvolvemento
 
+- replica o comportamento de https://github.com/bruno-garcia/pi-co-authored-by, porque captura o commit e non funciona con certos packages (como `gentle-ai`)
+
 - Os tipos da extensión veñen de `@earendil-works/pi-coding-agent`.
 - Instalación/eliminación usa o evento `session_start` e dous manexadores `registerCommand`
   (`pi-coauthor`, `pi-coauthor-off`).
