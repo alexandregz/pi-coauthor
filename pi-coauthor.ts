@@ -340,7 +340,10 @@ export default function (pi: ExtensionAPI): void {
     description: "Manage the pi-coauthor commit hook: [status|on|off|default_on|default_off]",
     getArgumentCompletions: (prefix: string) => {
       const opts = ["status", "on", "off", "default_on", "default_off"];
-      return opts.filter((o) => (prefix || "status") === "" || o.startsWith(prefix)).map((value) => ({ value }));
+      // Both `value` and `label` must always be non-empty strings: Pi's combined autocomplete
+      // provider reads item.value.endsWith() unconditionally and item.label.endsWith() in the
+      // "@" branch, so a missing field crashes with "Cannot read properties of undefined".
+      return opts.filter((o) => o.startsWith(prefix)).map((value) => ({ value, label: value }));
     },
     handler: async (args: string, ctx) => {
       await handleCommand(pi, ctx, args);
