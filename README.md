@@ -9,8 +9,7 @@ Co-authored-by: <PI_MODEL> <PI_MODEL@pi.dev>
 Generated-By: Pi <VERSION>
 ```
 
-O hook está restrinxido ao repositorio onde se lanza Pi (o mesmo modelo que o estado local `.atl`
-do proxecto) — nunca toca repositorios onde Pi non executou.
+O hook está restrinxido ao repositorio onde se lanza Pi — nunca toca repositorios onde Pi non executou.
 
 > ⚠️ **Só commits feitos "dende Pi"** — os trailers engádense automaticamente cando o commit o
 > executa unha sesión de Pi (detectada mediante `PI_SESSION_ID`, que inxecta o bash tool do
@@ -20,7 +19,8 @@ do proxecto) — nunca toca repositorios onde Pi non executou.
 
 ## Como funciona
 
-En `session_start`, a extensión escribe un hook `prepare-commit-msg` en `<repo>/.git/hooks/`.
+En `session_start`, a extensión escribe un hook `prepare-commit-msg` en `<repo>/.git/hooks/`
+(por defecto; ver os axustes `default_on` / `default_off` máis abaixo).
 
 O hook usa o mecanismo **estándar de Pi**: cando o axente executa unha orde co seu bash tool, Pi
 inxecta automaticamente no ambiente `PI_SESSION_ID`, `PI_PROVIDER` e `PI_MODEL`. Así:
@@ -45,14 +45,49 @@ só existe cando a orde a executa o bash tool do axente de Pi. Se non está, sae
 
 - **Respecta hooks existentes** — se xa existe un `prepare-commit-msg` que non sexa de pi-coauthor,
   déixao intacto.
-- **Só elimina o seu propio hook** — `pi-coauthor-off` borra o hook unicamente se leva o marcador de
-  pi-coauthor.
+- **Só elimina o seu propio hook** — `off` borra o hook unicamente se leva o marcador de pi-coauthor.
 - **Só en repositorios git** — executar Pi fóra dun repo git non fai nada.
 - **Formato de trailer** — os trailers `Co-authored-by:` / `Generated-By:` seguen as convencións de
-  GitHub e son idempotentes (sen duplicados).
+  git e son idempotentes (sen duplicados).
 - **Só commits de Pi** — detectados mediante `PI_SESSION_ID` (inxectado polo bash tool do axente);
   un commit manual queda intacto.
 - **Modelo vivo** — anótase `$PI_MODEL` do momento exacto do commit, sen estado persistente.
+
+---
+
+## Comando
+
+`/pi-coauthor [status|on|off|default_on|default_off]`
+
+| Argumento      | Efecto                                                                 |
+|----------------|------------------------------------------------------------------------|
+| *(ningún)*     | Igual que `status`.                                                     |
+| `status`       | Amosa se o hook está instalado neste repo e o default global.           |
+| `on`           | Activa o hook para este repo (`.git`).                                  |
+| `off`          | Desactiva o hook para este repo (`.git`).                               |
+| `default_on`   | Establece o default global de instalar o hook ao iniciar Pi.            |
+| `default_off`  | Establece o default global de NON instalar o hook ao iniciar Pi.        |
+
+**O default é `default_on`**, así que ao iniciar Pi nun repo git o hook instálase automaticamente
+(a non ser que ese repo se desactivase explicitamente con `off`).
+
+Ao iniciar, a extensión informa do seu estado, por exemplo:
+
+```
+pi-coauthor: hook installed (default: installs by default) [default_on]
+pi-coauthor: hook not installed (default: does not install) [default_off]
+```
+
+O hook actívase automaticamente cando o commit o executa unha sesión de Pi (detectada por
+`PI_SESSION_ID`). Non hai que prefixar nada:
+
+```bash
+# Commit "dende Pi" (o axente) → engade os trailers automaticamente
+git commit -m "mensaxe"
+
+# Commit manual (túa consola ou `!`) → sen trailers
+git commit -m "mensaxe"
+```
 
 ---
 
@@ -95,26 +130,6 @@ Notas da instalación manual: o hook só actúa nos commits que executa o bash t
 
 ---
 
-## Uso
-
-| Comando | Efecto |
-|---------|--------|
-| `/pi-coauthor` | Reinstala/amosa o hook estándar (detección via `PI_SESSION_ID`) neste repositorio. |
-| `/pi-coauthor-off` | Elimina o hook de pi-coauthor do repositorio actual. |
-
-O hook actívase automaticamente cando o commit o executa unha sesión de Pi (detectada por
-`PI_SESSION_ID`). Non hai que prefixar nada:
-
-```bash
-# Commit "dende Pi" (o axente) → engade os trailers automaticamente
-git commit -m "mensaxe"
-
-# Commit manual (túa consola ou `!`) → sen trailers
-git commit -m "mensaxe"
-```
-
----
-
 ## Exemplo de mensaxe de commit
 
 ```text
@@ -132,7 +147,8 @@ Generated-By: Pi 0.85.1
 pi-coauthor.ts                 Extensión de Pi (TypeScript) que instala/elimina o hook
 prepare-commit-msg.sample      Modelo de hook autónomo (instalación manual)
 package.json                   Manifest de Pi (campo `pi.extensions`) — fai o repo clonable
-README.md
+README.md                      Documentación (galego)
+README.en.md                   Documentación (inglés)
 LICENSE
 .gitignore
 ```
@@ -152,17 +168,16 @@ O repo é un paquete de extensión de Pi instalable por `git clone`. A chave é 
 }
 ```
 
-Pi descubre extensións nun subdirectorio de `~/.pi/agent/extensions/` se contén un `index.ts` ou un
+Pi descobre extensións nun subdirectorio de `~/.pi/agent/extensions/` se contén un `index.ts` ou un
 `package.json` co campo `pi.extensions` (array de rutas). Cando o repo se clona nese directorio, Pi
 le o manifest e carga `pi-coauthor.ts` automaticamente.
 
 ## Notas de desenvolvemento
 
 - replica o comportamento de https://github.com/bruno-garcia/pi-co-authored-by, porque captura o commit e non funciona con certos packages (como `gentle-ai`)
-
 - Os tipos da extensión veñen de `@earendil-works/pi-coding-agent`.
-- Instalación/eliminación usa o evento `session_start` e dous manexadores `registerCommand`
-  (`pi-coauthor`, `pi-coauthor-off`).
+- Instalación/eliminación usa o evento `session_start` e o comando `pi-coauthor` cos argumentos
+  `status | on | off | default_on | default_off`.
 - `ctx.hasUI` alterna entre notificacións interactivas (`ctx.ui.notify`) e saída por consola.
 
 ## Licenza
