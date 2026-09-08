@@ -9,10 +9,10 @@ MODEL="${PI_MODEL:-}"
 VERSION="$(pi --version 2>/dev/null | tr -d "[:space:]")"
 [ -n "$VERSION" ] || VERSION="unknown"
 MSG="$1"
-if ! grep -q "^Co-authored-by: ${MODEL} <${MODEL}@users.noreply.github.com>$" "$MSG"; then
+if ! grep -q "^Co-authored-by: ${MODEL} <${MODEL}@pi.dev>$" "$MSG"; then
   # Liña en branco antes do primeiro trailer (convención de trailers de git)
   [ -n "$(tail -n 1 "$MSG")" ] && printf "\n" >> "$MSG"
-  printf '%s\n' "Co-authored-by: ${MODEL} <${MODEL}@users.noreply.github.com>" >> "$MSG"
+  printf '%s\n' "Co-authored-by: ${MODEL} <${MODEL}@pi.dev>" >> "$MSG"
 fi
 grep -q "^Generated-By: Pi ${VERSION}$" "$MSG" || printf '%s\n' "Generated-By: Pi ${VERSION}" >> "$MSG"
 exit 0

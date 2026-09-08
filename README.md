@@ -5,7 +5,7 @@ que instala un hook de git `prepare-commit-msg` por repositorio. En cada commit 
 de atribución á mensaxe, se non están xa presentes:
 
 ```
-Co-authored-by: <PI_MODEL> <PI_MODEL@users.noreply.github.com>
+Co-authored-by: <PI_MODEL> <PI_MODEL@pi.dev>
 Generated-By: Pi <VERSION>
 ```
 
@@ -120,7 +120,7 @@ git commit -m "mensaxe"
 ```text
 feat: engadir trailers de atribución
 
-Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@users.noreply.github.com>
+Co-authored-by: deepseek-v4-flash <deepseek-v4-flash@pi.dev>
 Generated-By: Pi 0.85.1
 ```
 

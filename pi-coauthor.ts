@@ -11,7 +11,7 @@ import { execFileSync } from "node:child_process";
 //   - Só engade trailers cando o commit provén dunha sesión de Pi (PI_SESSION_ID presente);
 //   - usa $PI_MODEL (o modelo vivo do momento) e `pi --version` para a versión.
 // Engade aos commits dende Pi, se non están:
-//   Co-authored-by: <PI_MODEL> <PI_MODEL@users.noreply.github.com>
+//   Co-authored-by: <PI_MODEL> <PI_MODEL@pi.dev>
 //   Generated-By: Pi <VERSION>
 // Os commits manuais NUNCA levan trailers.
 // Scope: só repos onde se lanzou Pi. Para desinstalar: /pi-coauthor-off.
@@ -60,9 +60,9 @@ function hookScript(): string {
     '[ -n "$VERSION" ] || VERSION="unknown"',
     'MSG="$1"',
     // Liña en branco antes do primeiro trailer (convención de trailers de git)
-    `if ! grep -q "^Co-authored-by: ${modelShell} <${modelShell}@users.noreply.github.com>$" "$MSG"; then`,
+    `if ! grep -q "^Co-authored-by: ${modelShell} <${modelShell}@pi.dev>$" "$MSG"; then`,
     '  [ -n "$(tail -n 1 "$MSG")" ] && printf "\\n" >> "$MSG"',
-    `  printf '%s\\n' "Co-authored-by: ${modelShell} <${modelShell}@users.noreply.github.com>" >> "$MSG"`,
+    `  printf '%s\\n' "Co-authored-by: ${modelShell} <${modelShell}@pi.dev>" >> "$MSG"`
     'fi',
     `grep -q "^Generated-By: Pi ${versionShell}$" "$MSG" || printf '%s\\n' "Generated-By: Pi ${versionShell}" >> "$MSG"`,
     "exit 0",
