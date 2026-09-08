@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { readFile, writeFile, chmod, unlink } from "node:fs/promises";
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -144,7 +144,7 @@ function repoOffMarker(gitDir: string): string {
 function setRepoOn(gitDir: string): void {
   writeFileSync(repoOnMarker(gitDir), "", "utf8");
   try {
-    unlink(repoOffMarker(gitDir));
+    unlinkSync(repoOffMarker(gitDir));
   } catch {
     /* ignore */
   }
@@ -153,7 +153,7 @@ function setRepoOn(gitDir: string): void {
 function setRepoOff(gitDir: string): void {
   writeFileSync(repoOffMarker(gitDir), "", "utf8");
   try {
-    unlink(repoOnMarker(gitDir));
+    unlinkSync(repoOnMarker(gitDir));
   } catch {
     /* ignore */
   }
@@ -300,7 +300,7 @@ async function handleCommand(pi: ExtensionAPI, ctx: ExtensionContext, arg: strin
       // Ensure we don't leave a stale per-repo "on" override globally; repaint current repo.
       if (gitDir) {
         try {
-          unlink(repoOnMarker(gitDir));
+          unlinkSync(repoOnMarker(gitDir));
         } catch {
           /* ignore */
         }
